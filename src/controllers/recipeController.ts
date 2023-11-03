@@ -146,20 +146,27 @@ export const searchRecipesByIngredients = async (req: Request, res: Response) =>
   const ingredientList = ingredients.split(',').map(ingredient => ingredient.trim().toLowerCase());
 
   const recipeRepository = AppDataSource.getRepository(Recipe);
-  const queryBuilder = recipeRepository.createQueryBuilder('recipe')
+
+  const recipesWithMatchedIngredients = await recipeRepository
+    .createQueryBuilder('recipe')
+    .leftJoin('recipe.recipeIngredients', 'recipeIngredient')
+    .leftJoin('recipeIngredient.ingredient', 'ingredient')
+    .where(
+      ingredientList.map((ingredient, index) => 
+        `ingredient.name ILIKE :ingredient${index}`
+      ).join(' OR '),
+      Object.fromEntries(
+        ingredientList.map((ingredient, index) => [`ingredient${index}`, `%${ingredient}%`])
+      )
+    )
+    .getMany();
+
+  const fullRecipes = await recipeRepository
+    .createQueryBuilder('recipe')
     .leftJoinAndSelect('recipe.recipeIngredients', 'recipeIngredient')
-    .leftJoinAndSelect('recipeIngredient.ingredient', 'ingredient');
+    .leftJoinAndSelect('recipeIngredient.ingredient', 'ingredient')
+    .where('recipe.id IN (:...recipeIds)', { recipeIds: recipesWithMatchedIngredients.map(recipe => recipe.id) })
+    .getMany();
 
-  ingredientList.forEach((ingredient, index) => {
-    queryBuilder
-      .orWhere(`ingredient.name ILIKE :ingredient${index}`, { [`ingredient${index}`]: `%${ingredient}%` });
-  });
-
-  try {
-    const recipes = await queryBuilder.getMany();
-    res.json(recipes);
-  } catch (error) {
-    console.error('searchRecipesByIngredients - Error:', error);
-    res.status(500).send('Internal Server Error');
-  }
+  res.json(fullRecipes);
 };
