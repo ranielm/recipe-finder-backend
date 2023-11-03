@@ -31,8 +31,6 @@ app.use(cors(corsOptions));
 app.use("/api/recipes", recipeRoutes);
 
 AppDataSource.initialize().then(() => {
-  console.log("Data Source has been initialized!");
-
   const PORT = process.env.PORT || 5000;
   app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
