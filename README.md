@@ -37,6 +37,14 @@ DB_USER=your_mysql_username
 DB_PASSWORD=your_mysql_password
 DB_DATABASE=recipes_db
 
+## Set up the environment variables:
+
+Copy the .env.sample file to a new file named .env and update the variables to match your local setup.
+
+```bash
+cp .env.sample .env
+```
+
 ### Run the development server:
 
 ```bash
@@ -59,3 +67,8 @@ The following endpoints are available:
 - **Express** - Web framework for Node.js.
 - **TypeScript** - Typed superset of JavaScript.
 - **MySQL** - Open-source relational database management system.
+
+## Development Timeline
+
+This project was initiated and advanced to its current state as a result of a 4-hour coding challenge, during which the fundamental functionalities were established. Nonetheless, it is important to note that this version serves primarily as a prototype. The full-fledged application, with comprehensive features and enhancements, will be developed in a new project, separate from this initial challenge. Updates and progress on the new project will be shared as they occur.
+
