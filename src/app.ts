@@ -28,7 +28,7 @@ const corsOptions: CorsOptions = {
 
 app.use(cors(corsOptions));
 
-app.use("/recipe", recipeRoutes);
+app.use("/api/recipes", recipeRoutes);
 
 AppDataSource.initialize().then(() => {
   console.log("Data Source has been initialized!");
