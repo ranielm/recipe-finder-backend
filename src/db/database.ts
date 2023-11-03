@@ -12,7 +12,8 @@ export const AppDataSource = new DataSource({
   password: process.env.DB_PASSWORD,
   database: process.env.DB_DATABASE,
   entities: [Recipe, Ingredient, RecipeIngredient],
-  synchronize: true,
+  synchronize: false,
+  migrations: ['src/migration/**/*.ts'],
   logging: false
 });
 

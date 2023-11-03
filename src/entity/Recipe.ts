@@ -12,6 +12,15 @@ export class Recipe {
   @Column('text')
   description!: string;
 
+  @Column('text')
+  cookingInstructions!: string;
+
+  @Column({ nullable: true })
+  imageUrl?: string;
+
+  @Column('boolean', { default: false })
+  favorited!: boolean;
+
   @CreateDateColumn()
   createdAt!: Date;
 

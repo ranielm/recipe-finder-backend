@@ -82,6 +82,12 @@ http://localhost:5000/api/recipes
 http://localhost:5000/api/recipes/search?ingredients=garlic,broccoli
 ```
 
+## Schema Drop (new refresh)
+
+```bash
+yarn typeorm schema:drop -- -d src/db/database.ts 
+```
+
 ## Built With
 
 - **Node.js** - The JavaScript runtime environment.
