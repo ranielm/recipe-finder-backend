@@ -1,4 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToMany, JoinTable, ManyToOne, OneToMany } from 'typeorm';
+import { RecipeIngredient } from './RecipeIngredient';
 
 @Entity()
 export class Recipe {
@@ -8,6 +9,12 @@ export class Recipe {
   @Column()
   title!: string;
 
-  @Column("simple-array")
-  ingredients!: string[];
+  @Column('text')
+  description!: string;
+
+  @Column()
+  createdAt!: Date;
+
+  @OneToMany(() => RecipeIngredient, recipeIngredient => recipeIngredient.recipe)
+  recipeIngredients!: RecipeIngredient[];
 }
