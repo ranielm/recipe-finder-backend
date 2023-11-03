@@ -3,6 +3,8 @@ import cors, { CorsOptions } from "cors";
 import express from "express";
 import recipeRoutes from "./routes/recipeRoutes";
 import { AppDataSource } from "./db/database";
+import ingredientRoutes from "./routes/ingredientRoutes";
+import recipeIngredientRoutes from "./routes/recipeIngredientRoutes";
 
 dotenv.config();
 
@@ -29,6 +31,10 @@ const corsOptions: CorsOptions = {
 app.use(cors(corsOptions));
 
 app.use("/api/recipes", recipeRoutes);
+
+app.use('/api/ingredients', ingredientRoutes);
+
+app.use('/api/recipeIngredient', recipeIngredientRoutes);
 
 AppDataSource.initialize().then(() => {
   const PORT = process.env.PORT || 5000;

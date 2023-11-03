@@ -27,29 +27,36 @@ export const getRecipe = async (req: Request, res: Response) => {
 export const createRecipe = async (req: Request, res: Response) => {
   const { title, description, ingredients } = req.body;
 
-  const recipeRepository = AppDataSource.getRepository(Recipe);
-  const ingredientRepository = AppDataSource.getRepository(Ingredient);
-  const recipeIngredientRepository = AppDataSource.getRepository(RecipeIngredient);
+  await AppDataSource.transaction(async transactionalEntityManager => {
+    let recipeIngredients = [];
 
-  let recipeIngredients = [];
-  for (const ingredient of ingredients) {
-    let ingEntity = await ingredientRepository.findOneBy({ name: ingredient.name });
-    if (!ingEntity) {
-      ingEntity = ingredientRepository.create({ name: ingredient.name });
-      await ingredientRepository.save(ingEntity);
+    for (const ingredient of ingredients) {
+      let ingEntity = await transactionalEntityManager.findOneBy(Ingredient, { name: ingredient.name });
+      if (!ingEntity) {
+        ingEntity = transactionalEntityManager.create(Ingredient, {
+          name: ingredient.name,
+          description: ingredient.description
+        });
+        await transactionalEntityManager.save(Ingredient, ingEntity);
+      }
+      const recipeIngredient = transactionalEntityManager.create(RecipeIngredient, {
+        ingredient: ingEntity,
+        quantity: ingredient.quantity,
+        measurementUnit: ingredient.measurementUnit
+      });
+      await transactionalEntityManager.save(RecipeIngredient, recipeIngredient);
+      recipeIngredients.push(recipeIngredient);
     }
-    const recipeIngredient = recipeIngredientRepository.create({
-      ingredient: ingEntity,
-      quantity: ingredient.quantity,
-      measurementUnit: ingredient.measurementUnit
-    });
-    recipeIngredients.push(recipeIngredient);
-  }
 
-  const recipe = recipeRepository.create({ title, description, recipeIngredients });
-  await recipeRepository.save(recipe);
-  res.status(201).json(recipe);
+    const recipe = transactionalEntityManager.create(Recipe, { title, description, recipeIngredients });
+    await transactionalEntityManager.save(Recipe, recipe);
+    res.status(201).json(recipe);
+  }).catch(error => {
+    console.error('createRecipe - Error:', error);
+    res.status(500).send('Internal Server Error');
+  });
 };
+
 
 export const updateRecipe = async (req: Request, res: Response) => {
   const { id } = req.params;
@@ -99,35 +106,6 @@ export const updateRecipe = async (req: Request, res: Response) => {
   res.status(200).json(recipe);
 };
 
-export const searchRecipesByIngredients = async (req: Request, res: Response) => {
-  const { ingredients } = req.query;
-
-  if (!ingredients || typeof ingredients !== 'string') {
-    res.status(400).send('Ingredients query parameter is required and must be a string.');
-    return;
-  }
-
-  const ingredientList = ingredients.split(',').map(ingredient => ingredient.trim().toLowerCase());
-
-  const recipeRepository = AppDataSource.getRepository(Recipe);
-  const queryBuilder = recipeRepository.createQueryBuilder('recipe')
-    .leftJoinAndSelect('recipe.recipeIngredients', 'recipeIngredient')
-    .leftJoinAndSelect('recipeIngredient.ingredient', 'ingredient');
-
-  ingredientList.forEach((ingredient, index) => {
-    queryBuilder
-      .orWhere(`ingredient.name ILIKE :ingredient${index}`, { [`ingredient${index}`]: `%${ingredient}%` });
-  });
-
-  try {
-    const recipes = await queryBuilder.getMany();
-    res.json(recipes);
-  } catch (error) {
-    console.error('searchRecipesByIngredients - Error:', error);
-    res.status(500).send('Internal Server Error');
-  }
-};
-
 export const deleteRecipe = async (req: Request, res: Response) => {
   const { id } = req.params;
 
@@ -155,4 +133,33 @@ export const deleteRecipe = async (req: Request, res: Response) => {
     console.error('deleteRecipe - Error:', error);
     res.status(500).send('Internal Server Error');
   });
+};
+
+export const searchRecipesByIngredients = async (req: Request, res: Response) => {
+  const { ingredients } = req.query;
+
+  if (!ingredients || typeof ingredients !== 'string') {
+    res.status(400).send('Ingredients query parameter is required and must be a string.');
+    return;
+  }
+
+  const ingredientList = ingredients.split(',').map(ingredient => ingredient.trim().toLowerCase());
+
+  const recipeRepository = AppDataSource.getRepository(Recipe);
+  const queryBuilder = recipeRepository.createQueryBuilder('recipe')
+    .leftJoinAndSelect('recipe.recipeIngredients', 'recipeIngredient')
+    .leftJoinAndSelect('recipeIngredient.ingredient', 'ingredient');
+
+  ingredientList.forEach((ingredient, index) => {
+    queryBuilder
+      .orWhere(`ingredient.name ILIKE :ingredient${index}`, { [`ingredient${index}`]: `%${ingredient}%` });
+  });
+
+  try {
+    const recipes = await queryBuilder.getMany();
+    res.json(recipes);
+  } catch (error) {
+    console.error('searchRecipesByIngredients - Error:', error);
+    res.status(500).send('Internal Server Error');
+  }
 };

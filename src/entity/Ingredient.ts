@@ -9,8 +9,8 @@ export class Ingredient {
   @Column()
   name!: string;
 
-  @Column({ nullable: true })
-  description?: string;
+  @Column()
+  description!: string;
 
   @OneToMany(() => RecipeIngredient, recipeIngredient => recipeIngredient.ingredient)
   recipeIngredients!: RecipeIngredient[];
