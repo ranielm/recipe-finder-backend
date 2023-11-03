@@ -57,9 +57,30 @@ The following endpoints are available:
 
 - `GET /recipes` - Retrieve all recipes.
 - `GET /recipes/:id` - Retrieve a single recipe by its ID.
-- `POST /recipes` - Create a new recipe.
+- `POST /recipes` - Create a new recipe:
+
+```bash
+http://localhost:5000/api/recipes
+{
+  "title": "Chocolate Cake",
+  "description": "Rich and moist chocolate cake with a silky chocolate ganache.",
+  "ingredients": [
+    { "name": "all-purpose flour", "quantity": "200g" },
+    { "name": "sugar", "quantity": "100g" },
+    { "name": "cocoa powder", "quantity": "50g" }
+	]
+}
+```
+
+![Create a new recipe](/assets/image.png)
+
 - `PUT /recipes/:id` - Update an existing recipe.
 - `DELETE /recipes/:id` - Delete a recipe.
+- `GET /recipes/search` - Search for recipes by ingredients:
+
+```bash
+http://localhost:5000/api/recipes/search?ingredients=garlic,broccoli
+```
 
 ## Built With
 

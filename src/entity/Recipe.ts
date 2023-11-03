@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany, CreateDateColumn } from 'typeorm';
 import { RecipeIngredient } from './RecipeIngredient';
 
 @Entity()
@@ -12,7 +12,7 @@ export class Recipe {
   @Column('text')
   description!: string;
 
-  @Column()
+  @CreateDateColumn()
   createdAt!: Date;
 
   @OneToMany(() => RecipeIngredient, recipeIngredient => recipeIngredient.recipe)
