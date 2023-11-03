@@ -72,3 +72,4 @@ The following endpoints are available:
 
 This project was initiated and advanced to its current state as a result of a 4-hour coding challenge, during which the fundamental functionalities were established. Nonetheless, it is important to note that this version serves primarily as a prototype. The full-fledged application, with comprehensive features and enhancements, will be developed in a new project, separate from this initial challenge. Updates and progress on the new project will be shared as they occur.
 
+https://github.com/ranielm/recipe-finder-backend-complete
