@@ -1,10 +1,10 @@
-import dotenv from "dotenv";
-import cors, { CorsOptions } from "cors"; 
-import express from "express";
-import recipeRoutes from "./routes/recipeRoutes";
-import { AppDataSource } from "./db/database";
-import ingredientRoutes from "./routes/ingredientRoutes";
-import recipeIngredientRoutes from "./routes/recipeIngredientRoutes";
+import dotenv from 'dotenv';
+import cors, { CorsOptions } from 'cors';
+import express from 'express';
+import recipeRoutes from './routes/recipeRoutes';
+import { AppDataSource } from './db/database';
+import ingredientRoutes from './routes/ingredientRoutes';
+import recipeIngredientRoutes from './routes/recipeIngredientRoutes';
 
 dotenv.config();
 
@@ -23,25 +23,26 @@ const corsOptions: CorsOptions = {
     if (!origin || origin === ALLOWED_ORIGIN) {
       callback(null, true);
     } else {
-      callback(new Error("Not allowed by CORS"));
+      callback(new Error('Not allowed by CORS'));
     }
   },
 };
 
 app.use(cors(corsOptions));
 
-app.use("/api/recipes", recipeRoutes);
+app.use('/api/recipes', recipeRoutes);
 
 app.use('/api/ingredients', ingredientRoutes);
 
 app.use('/api/recipeIngredient', recipeIngredientRoutes);
 
-AppDataSource.initialize().then(() => {
-  const PORT = process.env.PORT || 5000;
-  app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+AppDataSource.initialize()
+  .then(() => {
+    const PORT = process.env.PORT || 5000;
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+    });
+  })
+  .catch((err) => {
+    console.error('Error during Data Source initialization:', err);
   });
-
-}).catch((err) => {
-  console.error("Error during Data Source initialization:", err);
-});

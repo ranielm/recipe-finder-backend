@@ -11,8 +11,18 @@
     "migration:run": "npm run typeorm migration:run",
     "migration:revert": "npm run typeorm migration:revert",
     "migration:create": "npm run typeorm migration:create -- -n",
-    "schema:drop": "npm run typeorm schema:drop"
+    "schema:drop": "npm run typeorm schema:drop",
+    "prettify": "prettier --write .",
+    "check-format": "prettier --check ."
   },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx,json,css,md}": "prettier --write"
+  },  
   "author": "Raniel Mendonça",
   "license": "ISC",
   "dependencies": {
@@ -31,6 +41,9 @@
     "@types/cors": "^2.8.13",
     "@types/express": "^4.17.20",
     "@types/node": "^20.8.10",
+    "husky": "^8.0.3",
+    "lint-staged": "^15.0.2",
+    "prettier": "^3.0.3",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.2.2"
   }

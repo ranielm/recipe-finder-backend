@@ -5,7 +5,7 @@ import { RecipeIngredient } from '../entity/RecipeIngredient';
 export const RecipeIngredientController = {
   getAllRecipeIngredient: async (req: Request, res: Response) => {
     const ingredientRepository = AppDataSource.getRepository(RecipeIngredient);
-    
+
     try {
       const ingredients = await ingredientRepository.find();
       res.json(ingredients);
@@ -16,5 +16,5 @@ export const RecipeIngredientController = {
         res.status(500).send('An unknown error occurred');
       }
     }
-  }
+  },
 };

@@ -32,6 +32,7 @@ yarn
 ```
 
 ### Set up your MySQL database and create a .env file with the necessary environment variables:
+
 DB_HOST=localhost
 DB_USER=your_mysql_username
 DB_PASSWORD=your_mysql_password
@@ -85,7 +86,7 @@ http://localhost:5000/api/recipes/search?ingredients=garlic,broccoli
 ## Schema Drop (new refresh)
 
 ```bash
-yarn typeorm schema:drop -- -d src/db/database.ts 
+yarn typeorm schema:drop -- -d src/db/database.ts
 ```
 
 ## Built With

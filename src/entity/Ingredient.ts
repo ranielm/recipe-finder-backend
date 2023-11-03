@@ -12,6 +12,9 @@ export class Ingredient {
   @Column()
   description!: string;
 
-  @OneToMany(() => RecipeIngredient, recipeIngredient => recipeIngredient.ingredient)
+  @OneToMany(
+    () => RecipeIngredient,
+    (recipeIngredient) => recipeIngredient.ingredient
+  )
   recipeIngredients!: RecipeIngredient[];
 }

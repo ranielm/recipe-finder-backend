@@ -6,7 +6,7 @@ export const IngredientController = {
   addIngredient: async (req: Request, res: Response) => {
     const { name, description } = req.body;
     const ingredientRepository = AppDataSource.getRepository(Ingredient);
-    
+
     try {
       let ingredient = ingredientRepository.create({ name, description });
       ingredient = await ingredientRepository.save(ingredient);
@@ -16,13 +16,13 @@ export const IngredientController = {
         res.status(500).send(error.message);
       } else {
         res.status(500).send('An unknown error occurred');
-      }        
+      }
     }
   },
 
   getAllIngredients: async (req: Request, res: Response) => {
     const ingredientRepository = AppDataSource.getRepository(Ingredient);
-    
+
     try {
       const ingredients = await ingredientRepository.find();
       res.json(ingredients);
@@ -38,9 +38,11 @@ export const IngredientController = {
   getIngredientById: async (req: Request, res: Response) => {
     const { id } = req.params;
     const ingredientRepository = AppDataSource.getRepository(Ingredient);
-    
+
     try {
-      const ingredient = await ingredientRepository.findOneBy({ id: parseInt(id) });
+      const ingredient = await ingredientRepository.findOneBy({
+        id: parseInt(id),
+      });
       if (ingredient) {
         res.json(ingredient);
       } else {
@@ -61,7 +63,9 @@ export const IngredientController = {
     const ingredientRepository = AppDataSource.getRepository(Ingredient);
 
     try {
-      let ingredient = await ingredientRepository.findOneBy({ id: parseInt(id) });
+      let ingredient = await ingredientRepository.findOneBy({
+        id: parseInt(id),
+      });
       if (ingredient) {
         ingredient.name = name;
         ingredient.description = description;

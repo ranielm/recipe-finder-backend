@@ -14,13 +14,13 @@ export const AppDataSource = new DataSource({
   entities: [Recipe, Ingredient, RecipeIngredient],
   synchronize: false,
   migrations: ['src/migration/**/*.ts'],
-  logging: false
+  logging: false,
 });
 
 AppDataSource.initialize()
   .then(() => {
-    console.log("Data Source has been initialized!");
+    console.log('Data Source has been initialized!');
   })
   .catch((err) => {
-    console.error("Error during Data Source initialization:", err);
+    console.error('Error during Data Source initialization:', err);
   });
