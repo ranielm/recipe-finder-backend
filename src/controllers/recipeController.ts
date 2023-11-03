@@ -49,3 +49,30 @@ export const deleteRecipe = async (req: Request, res: Response) => {
     res.status(404).send('Recipe not found');
   }
 };
+
+export const searchRecipesByIngredients = async (req: Request, res: Response) => {
+  const { ingredients } = req.query;
+
+  if (!ingredients || typeof ingredients !== 'string') {
+    res.status(400).send('Ingredients query parameter is required and must be a string.');
+    return;
+  }
+
+  const ingredientList = ingredients.split(',').map(ingredient => ingredient.trim().toLowerCase());
+
+  const recipeRepository = AppDataSource.getRepository(Recipe);
+  const queryBuilder = recipeRepository.createQueryBuilder('recipe');
+
+  ingredientList.forEach((ingredient, index) => {
+    queryBuilder
+      .orWhere(`recipe.ingredients ILIKE :ingredient${index}`, { [`ingredient${index}`]: `%${ingredient}%` });
+  });
+
+  try {
+    const recipes = await queryBuilder.getMany();
+    res.json(recipes);
+  } catch (error) {
+    console.error('searchRecipesByIngredients - Error:', error);
+    res.status(500).send('Internal Server Error');
+  }
+};
