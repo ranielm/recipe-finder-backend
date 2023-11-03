@@ -57,7 +57,6 @@ export const createRecipe = async (req: Request, res: Response) => {
   });
 };
 
-
 export const updateRecipe = async (req: Request, res: Response) => {
   const { id } = req.params;
   const { title, description, ingredients } = req.body;
@@ -152,7 +151,7 @@ export const searchRecipesByIngredients = async (req: Request, res: Response) =>
     .leftJoin('recipe.recipeIngredients', 'recipeIngredient')
     .leftJoin('recipeIngredient.ingredient', 'ingredient')
     .where(
-      ingredientList.map((ingredient, index) => 
+      ingredientList.map((_ingredient, index) => 
         `ingredient.name ILIKE :ingredient${index}`
       ).join(' OR '),
       Object.fromEntries(
