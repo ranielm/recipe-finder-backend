@@ -28,42 +28,44 @@ export const RecipeIController = {
   },
 
   createRecipe: async (req: Request, res: Response) => {
-    const { title, description, ingredients } = req.body;
+    const {
+      title,
+      description,
+      cookingInstructions,
+      imageUrl,
+      recipeIngredients,
+    } = req.body;
 
     await AppDataSource.transaction(async (transactionalEntityManager) => {
-      let recipeIngredients = [];
+      let ingredientEntities = [];
 
-      for (const ingredient of ingredients) {
-        let ingEntity = await transactionalEntityManager.findOneBy(Ingredient, {
-          name: ingredient.name,
-        });
-        if (!ingEntity) {
-          ingEntity = transactionalEntityManager.create(Ingredient, {
-            name: ingredient.name,
-            description: ingredient.description,
-          });
-          await transactionalEntityManager.save(Ingredient, ingEntity);
-        }
-        const recipeIngredient = transactionalEntityManager.create(
-          RecipeIngredient,
+      for (const ri of recipeIngredients) {
+        let ingredientEntity = await transactionalEntityManager.findOneBy(
+          Ingredient,
           {
-            ingredient: ingEntity,
-            quantity: ingredient.quantity,
-            measurementUnit: ingredient.measurementUnit,
+            id: ri.ingredientId,
           }
         );
-        await transactionalEntityManager.save(
-          RecipeIngredient,
-          recipeIngredient
-        );
-        recipeIngredients.push(recipeIngredient);
+        if (!ingredientEntity) {
+          return res
+            .status(400)
+            .send('Ingredient not found: ' + ri.ingredientId);
+        }
+        ingredientEntities.push({
+          ingredient: ingredientEntity,
+          quantity: ri.quantity,
+          measurementUnit: ri.measurementUnit,
+        });
       }
 
       const recipe = transactionalEntityManager.create(Recipe, {
         title,
         description,
-        recipeIngredients,
+        cookingInstructions,
+        imageUrl,
+        recipeIngredients: ingredientEntities,
       });
+
       await transactionalEntityManager.save(Recipe, recipe);
       res.status(201).json(recipe);
     }).catch((error) => {
