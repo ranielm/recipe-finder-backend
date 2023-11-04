@@ -63,11 +63,31 @@ export const RecipeIController = {
         description,
         cookingInstructions,
         imageUrl,
-        recipeIngredients: ingredientEntities,
+        recipeIngredients: recipeIngredients.map(
+          (ri: {
+            ingredientId: number;
+            quantity: number;
+            measurementUnit: string;
+          }) =>
+            transactionalEntityManager.create(RecipeIngredient, {
+              ingredient: { id: ri.ingredientId },
+              quantity: ri.quantity,
+              measurementUnit: ri.measurementUnit,
+            })
+        ),
       });
 
       await transactionalEntityManager.save(Recipe, recipe);
-      res.status(201).json(recipe);
+
+      const recipeToResponse = {
+        title,
+        description,
+        cookingInstructions,
+        imageUrl,
+        recipeIngredients: ingredientEntities,
+      };
+
+      res.status(201).json(recipeToResponse);
     }).catch((error) => {
       console.error('createRecipe - Error:', error);
       res.status(500).send('Internal Server Error');
@@ -189,6 +209,11 @@ export const RecipeIController = {
         )
       )
       .getMany();
+
+    if (recipesWithMatchedIngredients.length === 0) {
+      res.json([]);
+      return;
+    }
 
     const fullRecipes = await recipeRepository
       .createQueryBuilder('recipe')

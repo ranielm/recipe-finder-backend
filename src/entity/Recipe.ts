@@ -32,7 +32,10 @@ export class Recipe {
 
   @OneToMany(
     () => RecipeIngredient,
-    (recipeIngredient) => recipeIngredient.recipe
+    (recipeIngredient) => recipeIngredient.recipe,
+    {
+      cascade: true,
+    }
   )
   recipeIngredients!: RecipeIngredient[];
 }

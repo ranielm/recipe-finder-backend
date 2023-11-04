@@ -14,11 +14,9 @@ export class RecipeIngredient {
   id!: number;
 
   @ManyToOne(() => Recipe, (recipe) => recipe.recipeIngredients)
-  @JoinTable()
   recipe!: Recipe;
 
   @ManyToOne(() => Ingredient, (ingredient) => ingredient.recipeIngredients)
-  @JoinTable()
   ingredient!: Ingredient;
 
   @Column('decimal', { precision: 5, scale: 2, nullable: true })
