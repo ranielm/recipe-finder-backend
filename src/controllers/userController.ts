@@ -139,4 +139,36 @@ export const UserController = {
       }
     }
   },
+
+  listFavorites: async (req: Request, res: Response) => {
+    const userId = (req as any).user.userId;
+
+    if (!userId) {
+      return res.status(401).send('User not authenticated');
+    }
+
+    try {
+      const userFavoriteRepository = AppDataSource.getRepository(UserFavorite);
+
+      const userFavorites = await userFavoriteRepository.find({
+        where: { userId },
+        relations: [
+          'recipe',
+          'recipe.recipeIngredients',
+          'recipe.recipeIngredients.ingredient',
+        ],
+      });
+
+      const recipesWithIngredients = userFavorites.map((favorite) => {
+        return {
+          ...favorite.recipe,
+        };
+      });
+
+      res.status(200).json(recipesWithIngredients);
+    } catch (error) {
+      console.error('listFavorites - Error:', error);
+      res.status(500).send('Internal Server Error');
+    }
+  },
 };

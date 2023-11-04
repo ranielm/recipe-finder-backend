@@ -8,7 +8,16 @@ router.post('/register', UserController.register);
 
 router.post('/login', UserController.login);
 
-router.post('/recipe/:recipeId/favorite', isAuthenticated, UserController.addFavorite);
-router.delete('/recipe/:recipeId/favorite', isAuthenticated, UserController.removeFavorite);
+router.post(
+  '/recipes/:recipeId/favorite',
+  isAuthenticated,
+  UserController.addFavorite
+);
+router.delete(
+  '/recipes/:recipeId/favorite',
+  isAuthenticated,
+  UserController.removeFavorite
+);
+router.get('/recipes/favorites', isAuthenticated, UserController.listFavorites);
 
 export default router;
