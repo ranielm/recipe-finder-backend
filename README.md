@@ -85,12 +85,6 @@ http://localhost:5000/api/recipes/search?ingredients=garlic,broccoli
 
 ## Migrations
 
-# Run Migration
-
-```bash
-yarn migration:run
-```
-
 # Schema Drop (new refresh)
 
 ```bash
@@ -103,9 +97,3 @@ yarn typeorm schema:drop
 - **Express** - Web framework for Node.js.
 - **TypeScript** - Typed superset of JavaScript.
 - **MySQL** - Open-source relational database management system.
-
-## Development Timeline
-
-This project was initiated and advanced to its current state as a result of a 4-hour coding challenge, during which the fundamental functionalities were established. Nonetheless, it is important to note that this version serves primarily as a prototype. The full-fledged application, with comprehensive features and enhancements, will be developed in a new project, separate from this initial challenge. Updates and progress on the new project will be shared as they occur.
-
-https://github.com/ranielm/recipe-finder-backend-complete
