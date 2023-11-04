@@ -5,6 +5,7 @@ import recipeRoutes from './routes/recipeRoutes';
 import { AppDataSource } from './db/database';
 import ingredientRoutes from './routes/ingredientRoutes';
 import recipeIngredientRoutes from './routes/recipeIngredientRoutes';
+import { isAuthenticated } from './middlewares/isAuthenticated';
 
 dotenv.config();
 
@@ -30,11 +31,11 @@ const corsOptions: CorsOptions = {
 
 app.use(cors(corsOptions));
 
-app.use('/api/recipes', recipeRoutes);
+app.use('/api/recipes', isAuthenticated, recipeRoutes);
 
-app.use('/api/ingredients', ingredientRoutes);
+app.use('/api/ingredients', isAuthenticated, ingredientRoutes);
 
-app.use('/api/recipeIngredient', recipeIngredientRoutes);
+app.use('/api/recipeIngredient', isAuthenticated, recipeIngredientRoutes);
 
 AppDataSource.initialize()
   .then(() => {
@@ -44,5 +45,9 @@ AppDataSource.initialize()
     });
   })
   .catch((err) => {
-    console.error('Error during Data Source initialization:', err);
+    console.error(
+      'Error during Data Source initialization:',
+      isAuthenticated,
+      err
+    );
   });
