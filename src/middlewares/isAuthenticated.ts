@@ -22,7 +22,6 @@ export const isAuthenticated = (
     (req as any).user = payload;
     next();
   } catch (error) {
-    console.error('🚀 ~ file: isAuthenticated.ts:27 ~ error:', error);
     return res.sendStatus(403);
   }
 };

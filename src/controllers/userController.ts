@@ -75,7 +75,7 @@ export const UserController = {
   },
 
   addFavorite: async (req: Request, res: Response) => {
-    const userId = parseInt(req.params.userId);
+    const userId = (req as any).user.userId;
     const recipeId = parseInt(req.params.recipeId);
 
     try {
@@ -110,7 +110,7 @@ export const UserController = {
   },
 
   removeFavorite: async (req: Request, res: Response) => {
-    const userId = parseInt(req.params.userId);
+    const userId = (req as any).user.userId;
     const recipeId = parseInt(req.params.recipeId);
 
     try {

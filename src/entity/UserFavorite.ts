@@ -1,4 +1,4 @@
-import { Entity, ManyToOne, PrimaryColumn } from 'typeorm';
+import { Entity, ManyToOne, JoinColumn, PrimaryColumn } from 'typeorm';
 import { User } from './User';
 import { Recipe } from './Recipe';
 
@@ -11,8 +11,10 @@ export class UserFavorite {
   recipeId!: number;
 
   @ManyToOne(() => User, (user) => user.favorites)
+  @JoinColumn({ name: 'userId' })
   user!: User;
 
-  @ManyToOne(() => Recipe, (recipe) => recipe.id)
+  @ManyToOne(() => Recipe, (recipe) => recipe.favoritedByUsers)
+  @JoinColumn({ name: 'recipeId' })
   recipe!: Recipe;
 }
