@@ -5,6 +5,7 @@ import { Recipe } from '../entity/Recipe';
 import { hash, compare } from 'bcryptjs';
 import { sign } from 'jsonwebtoken';
 import { UserFavorite } from '../entity/UserFavorite';
+import { secret } from '../middlewares/isAuthenticated';
 
 export const UserController = {
   register: async (req: Request, res: Response) => {
@@ -55,7 +56,11 @@ export const UserController = {
         return res.status(401).send('Credentials are invalid');
       }
 
-      const token = sign({ userId: user.id }, 'your_jwt_secret', {
+      if (!secret) {
+        throw new Error('JWT_SECRET is not set');
+      }
+
+      const token = sign({ userId: user.id }, secret, {
         expiresIn: '1h',
       });
 

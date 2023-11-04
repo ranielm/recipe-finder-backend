@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { verify } from 'jsonwebtoken';
 
-const secret = process.env.JWT_SECRET;
+export const secret = process.env.JWT_SECRET;
 
 export const isAuthenticated = (
   req: Request,
@@ -22,6 +22,7 @@ export const isAuthenticated = (
     (req as any).user = payload;
     next();
   } catch (error) {
+    console.error('🚀 ~ file: isAuthenticated.ts:27 ~ error:', error);
     return res.sendStatus(403);
   }
 };
