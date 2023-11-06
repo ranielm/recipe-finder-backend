@@ -75,6 +75,7 @@ export const IngredientController = {
         res.status(404).send('Ingredient not found');
       }
     } catch (error) {
+      console.error('updateIngredient - Error:', error);
       if (error instanceof Error) {
         res.status(500).send(error.message);
       } else {

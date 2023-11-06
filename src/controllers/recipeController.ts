@@ -6,24 +6,34 @@ import { AppDataSource } from '../db/database';
 
 export const RecipeIController = {
   getAllRecipes: async (_req: Request, res: Response) => {
-    const recipeRepository = AppDataSource.getRepository(Recipe);
-    const recipes = await recipeRepository.find({
-      relations: ['recipeIngredients', 'recipeIngredients.ingredient'],
-    });
-    res.json(recipes);
+    try {
+      const recipeRepository = AppDataSource.getRepository(Recipe);
+      const recipes = await recipeRepository.find({
+        relations: ['recipeIngredients', 'recipeIngredients.ingredient'],
+      });
+      res.json(recipes);
+    } catch (error) {
+      console.error('getAllRecipes - Error:', error);
+      res.status(500).send('Internal Server Error');
+    }
   },
 
   getRecipe: async (req: Request, res: Response) => {
-    const { id } = req.params;
-    const recipeRepository = AppDataSource.getRepository(Recipe);
-    const recipe = await recipeRepository.findOne({
-      where: { id: parseInt(id) },
-      relations: ['recipeIngredients', 'recipeIngredients.ingredient'],
-    });
-    if (recipe) {
-      res.json(recipe);
-    } else {
-      res.status(404).send('Recipe not found');
+    try {
+      const { id } = req.params;
+      const recipeRepository = AppDataSource.getRepository(Recipe);
+      const recipe = await recipeRepository.findOne({
+        where: { id: parseInt(id) },
+        relations: ['recipeIngredients', 'recipeIngredients.ingredient'],
+      });
+      if (recipe) {
+        res.json(recipe);
+      } else {
+        res.status(404).send('Recipe not found');
+      }
+    } catch (error) {
+      console.error('getRecipe - Error:', error);
+      res.status(500).send('Internal Server Error');
     }
   },
 
@@ -95,54 +105,36 @@ export const RecipeIController = {
   },
 
   updateRecipe: async (req: Request, res: Response) => {
-    const { id } = req.params;
-    const { title, description, ingredients } = req.body;
+    try {
+      const { id } = req.params;
+      const { title, description, recipeIngredients, imageUrl } = req.body;
 
-    const recipeRepository = AppDataSource.getRepository(Recipe);
-    const ingredientRepository = AppDataSource.getRepository(Ingredient);
-    const recipeIngredientRepository =
-      AppDataSource.getRepository(RecipeIngredient);
+      const recipeRepository = AppDataSource.getRepository(Recipe);
+      const ingredientRepository = AppDataSource.getRepository(Ingredient);
+      const recipeIngredientRepository =
+        AppDataSource.getRepository(RecipeIngredient);
 
-    let recipe = await recipeRepository.findOne({
-      where: { id: parseInt(id) },
-      relations: ['recipeIngredients', 'recipeIngredients.ingredient'],
-    });
-
-    if (!recipe) {
-      res.status(404).send('Recipe not found');
-      return;
-    }
-
-    recipe.title = title;
-    recipe.description = description;
-
-    if (recipe.recipeIngredients) {
-      for (const recipeIngredient of recipe.recipeIngredients) {
-        await recipeIngredientRepository.remove(recipeIngredient);
-      }
-    }
-    recipe.recipeIngredients = [];
-
-    for (const ingredientData of ingredients) {
-      let ingredient = await ingredientRepository.findOneBy({
-        name: ingredientData.name,
+      let recipe = await recipeRepository.findOne({
+        where: { id: parseInt(id) },
+        relations: ['recipeIngredients', 'recipeIngredients.ingredient'],
       });
 
-      if (!ingredient) {
-        ingredient = ingredientRepository.create({ name: ingredientData.name });
-        await ingredientRepository.save(ingredient);
+      if (!recipe) {
+        res.status(404).send('Recipe not found');
+        return;
       }
 
-      const recipeIngredient = recipeIngredientRepository.create({
-        ingredient: ingredient,
-        quantity: ingredientData.quantity,
-        measurementUnit: ingredientData.measurementUnit,
-      });
-      recipe.recipeIngredients.push(recipeIngredient);
-    }
+      recipe.title = title;
+      recipe.description = description;
+      recipe.recipeIngredients = recipeIngredients;
+      recipe.imageUrl = imageUrl;
 
-    await recipeRepository.save(recipe);
-    res.status(200).json(recipe);
+      await recipeRepository.save(recipe);
+      res.status(200).json(recipe);
+    } catch (error) {
+      console.error('updateRecipe - Error:', error);
+      res.status(500).send('Internal Server Error');
+    }
   },
 
   deleteRecipe: async (req: Request, res: Response) => {
@@ -176,54 +168,62 @@ export const RecipeIController = {
   },
 
   searchRecipesByIngredients: async (req: Request, res: Response) => {
-    const { ingredients } = req.query;
+    try {
+      const { ingredients } = req.query;
 
-    if (!ingredients || typeof ingredients !== 'string') {
-      res
-        .status(400)
-        .send('Ingredients query parameter is required and must be a string.');
-      return;
-    }
+      if (!ingredients || typeof ingredients !== 'string') {
+        res
+          .status(400)
+          .send(
+            'Ingredients query parameter is required and must be a string.'
+          );
+        return;
+      }
 
-    const ingredientList = ingredients
-      .split(',')
-      .map((ingredient) => ingredient.trim().toLowerCase());
+      const ingredientList = ingredients
+        .split(',')
+        .map((ingredient) => ingredient.trim().toLowerCase());
 
-    const recipeRepository = AppDataSource.getRepository(Recipe);
+      const recipeRepository = AppDataSource.getRepository(Recipe);
 
-    const recipesWithMatchedIngredients = await recipeRepository
-      .createQueryBuilder('recipe')
-      .leftJoin('recipe.recipeIngredients', 'recipeIngredient')
-      .leftJoin('recipeIngredient.ingredient', 'ingredient')
-      .where(
-        ingredientList
-          .map(
-            (_ingredient, index) => `ingredient.name ILIKE :ingredient${index}`
+      const recipesWithMatchedIngredients = await recipeRepository
+        .createQueryBuilder('recipe')
+        .leftJoin('recipe.recipeIngredients', 'recipeIngredient')
+        .leftJoin('recipeIngredient.ingredient', 'ingredient')
+        .where(
+          ingredientList
+            .map(
+              (_ingredient, index) =>
+                `ingredient.name ILIKE :ingredient${index}`
+            )
+            .join(' OR '),
+          Object.fromEntries(
+            ingredientList.map((ingredient, index) => [
+              `ingredient${index}`,
+              `%${ingredient}%`,
+            ])
           )
-          .join(' OR '),
-        Object.fromEntries(
-          ingredientList.map((ingredient, index) => [
-            `ingredient${index}`,
-            `%${ingredient}%`,
-          ])
         )
-      )
-      .getMany();
+        .getMany();
 
-    if (recipesWithMatchedIngredients.length === 0) {
-      res.json([]);
-      return;
+      if (recipesWithMatchedIngredients.length === 0) {
+        res.json([]);
+        return;
+      }
+
+      const fullRecipes = await recipeRepository
+        .createQueryBuilder('recipe')
+        .leftJoinAndSelect('recipe.recipeIngredients', 'recipeIngredient')
+        .leftJoinAndSelect('recipeIngredient.ingredient', 'ingredient')
+        .where('recipe.id IN (:...recipeIds)', {
+          recipeIds: recipesWithMatchedIngredients.map((recipe) => recipe.id),
+        })
+        .getMany();
+
+      res.json(fullRecipes);
+    } catch (error) {
+      console.error('deleteRecipe - Error:', error);
+      res.status(500).send('Internal Server Error');
     }
-
-    const fullRecipes = await recipeRepository
-      .createQueryBuilder('recipe')
-      .leftJoinAndSelect('recipe.recipeIngredients', 'recipeIngredient')
-      .leftJoinAndSelect('recipeIngredient.ingredient', 'ingredient')
-      .where('recipe.id IN (:...recipeIds)', {
-        recipeIds: recipesWithMatchedIngredients.map((recipe) => recipe.id),
-      })
-      .getMany();
-
-    res.json(fullRecipes);
   },
 };
