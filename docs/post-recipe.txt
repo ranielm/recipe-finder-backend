@@ -27,7 +27,7 @@
   "title": "Heavenly Oatmeal Raisin Cookies",
   "description": "Warm, chewy oatmeal raisin cookies that are a comforting treat any time.",
   "cookingInstructions": "1. Preheat oven to 350°F (175°C).\n2. In a large bowl, cream together the butter, white sugar, and brown sugar until smooth.\n3. Beat in eggs one at a time, then add vanilla extract.\n4. Combine flour, baking soda, cinnamon, and salt in a separate bowl.\n5. Gradually beat into the creamed mixture. Stir in oats and raisins last.\n6. Drop by teaspoonfuls onto greased cookie sheets.\n7. Bake for 10 to 12 minutes until golden brown. Let cool for 2 minutes.",
-  "imageUrl": "https://i.ibb.co/HrfVRcx/oatmeal-raisin-cookies.jpg",
+	"imageUrl": "https://i.ibb.co/Cwp93Cy/oatmeal-raisin-cookie-horizontal-jpg-1524664178.jpg",		
   "favorited": true,
   "recipeIngredients": [
     {
