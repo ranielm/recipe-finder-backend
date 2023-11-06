@@ -7,7 +7,6 @@ import {
   BeforeInsert,
 } from 'typeorm';
 import { UserFavorite } from './UserFavorite';
-import * as bcrypt from 'bcryptjs';
 
 @Entity()
 export class User {
@@ -27,9 +26,4 @@ export class User {
 
   @OneToMany(() => UserFavorite, (userFavorite) => userFavorite.user)
   favorites!: UserFavorite[];
-
-  @BeforeInsert()
-  async hashPassword() {
-    this.password = await bcrypt.hash(this.password, 8);
-  }
 }

@@ -2,14 +2,30 @@ import { Request, Response } from 'express';
 import { AppDataSource } from '../db/database';
 import { User } from '../entity/User';
 import { Recipe } from '../entity/Recipe';
-import { hash, compare } from 'bcryptjs';
 import { sign } from 'jsonwebtoken';
 import { UserFavorite } from '../entity/UserFavorite';
 import { secret } from '../middlewares/isAuthenticated';
+import { compare, hash } from 'bcryptjs';
+
+const SALT_ROUNDS = 12;
+
+const validateUserInput = (
+  username: string,
+  email: string,
+  password: string
+): boolean => {
+  return (
+    username.trim() !== '' && email.trim() !== '' && password.trim() !== ''
+  );
+};
 
 export const UserController = {
   register: async (req: Request, res: Response) => {
     const { username, email, password } = req.body;
+
+    if (!validateUserInput(username, email, password)) {
+      return res.status(400).send('Invalid input data');
+    }
 
     try {
       const userRepository = AppDataSource.getRepository(User);
@@ -19,7 +35,7 @@ export const UserController = {
         return res.status(400).send('User already exists');
       }
 
-      const hashedPassword = await hash(password, 12);
+      const hashedPassword = await hash(password, SALT_ROUNDS);
 
       const newUser = userRepository.create({
         username,
@@ -30,18 +46,19 @@ export const UserController = {
       await userRepository.save(newUser);
 
       const { password: _, ...userWithoutPassword } = newUser;
-      res.status(201).json(userWithoutPassword);
+      return res.status(201).json(userWithoutPassword);
     } catch (error) {
-      if (error instanceof Error) {
-        res.status(500).send(error.message);
-      } else {
-        res.status(500).send('An unknown error occurred');
-      }
+      console.error('Registration error:', error);
+      return res.status(500).send('Failed to register user');
     }
   },
 
   login: async (req: Request, res: Response) => {
     const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).send('Email and password are required');
+    }
 
     try {
       const userRepository = AppDataSource.getRepository(User);
@@ -50,30 +67,22 @@ export const UserController = {
       if (!user) {
         return res.status(401).send('Credentials are invalid');
       }
-
       const isValid = await compare(password, user.password);
+
       if (!isValid) {
         return res.status(401).send('Credentials are invalid');
       }
 
-      if (!secret) {
-        throw new Error('JWT_SECRET is not set');
-      }
-
-      const token = sign({ userId: user.id }, secret, {
+      const token = sign({ userId: user.id }, String(secret), {
         expiresIn: '1h',
       });
 
-      res.status(200).json({ token });
+      return res.status(200).json({ token });
     } catch (error) {
-      if (error instanceof Error) {
-        res.status(500).send(error.message);
-      } else {
-        res.status(500).send('An unknown error occurred');
-      }
+      console.error('Login error:', error);
+      return res.status(500).send('Failed to log in user');
     }
   },
-
   addFavorite: async (req: Request, res: Response) => {
     const userId = (req as any).user.userId;
     const recipeId = parseInt(req.params.recipeId);
