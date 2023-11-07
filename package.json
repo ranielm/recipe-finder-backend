@@ -4,14 +4,16 @@
   "description": "",
   "main": "app.js",
   "scripts": {
+    "reset:sequences": "ts-node src/db/seeds/resetSequences.ts",
+    "seed:database": "ts-node src/db/seeds/seedDatabase.ts",
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "ts-node-dev --respawn --transpile-only src/app.ts",
     "typeorm": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js",
-    "migration:generate": "npm run typeorm migration:generate -- -d src/db/database.ts -n",
+    "migration:generate": "npm run typeorm migration:generate -- -d src/db/database.ts",
     "migration:run": "npm run typeorm migration:run -- -d src/db/database.ts",
     "migration:revert": "npm run typeorm migration:revert -- -d src/db/database.ts",
     "migration:create": "npm run typeorm migration:create -- -n",
-    "schema:drop": "npm run typeorm schema:drop -- -d src/db/database.ts && yarn start",
+    "schema:drop": "npm run typeorm schema:drop -- -d src/db/database.ts",
     "prettify": "prettier --write .",
     "check-format": "prettier --check ."
   },

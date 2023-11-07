@@ -1,6 +1,6 @@
 # Recipe Management API
 
-This is a simple Recipe Management API built with Node.js, Express, and TypeScript, interfacing with a MySQL database. It allows for basic CRUD operations on recipes.
+This is a simple Recipe Management API built with Node.js, Express, and TypeScript, interfacing with a PostgreSQL database. It allows for basic CRUD operations on recipes.
 
 ## Getting Started
 
@@ -12,7 +12,7 @@ What things you need to install the software and how to install them:
 
 - Node.js
 - npm or yarn
-- MySQL
+- PostgreSQL
 
 ### Installing
 
@@ -31,11 +31,11 @@ cd your-repository-name
 yarn
 ```
 
-### Set up your MySQL database and create a .env file with the necessary environment variables:
+### Set up your PostgreSQL database and create a .env file with the necessary environment variables:
 
 DB_HOST=localhost
-DB_USER=your_mysql_username
-DB_PASSWORD=your_mysql_password
+DB_USER=your_PostgreSQL_username
+DB_PASSWORD=your_PostgreSQL_password
 DB_DATABASE=recipes_db
 
 ## Set up the environment variables:
@@ -88,7 +88,7 @@ http://localhost:5000/api/recipes/search?ingredients=garlic,broccoli
 # Schema Drop (new refresh)
 
 ```bash
-yarn typeorm schema:drop
+yarn schema:drop
 ```
 
 ## Built With
@@ -96,4 +96,4 @@ yarn typeorm schema:drop
 - **Node.js** - The JavaScript runtime environment.
 - **Express** - Web framework for Node.js.
 - **TypeScript** - Typed superset of JavaScript.
-- **MySQL** - Open-source relational database management system.
+- **PostgreSQL** - Open-source relational database management system.

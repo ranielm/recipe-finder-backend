@@ -16,7 +16,7 @@ export const AppDataSource = new DataSource({
   entities: [Recipe, Ingredient, RecipeIngredient, User, UserFavorite],
   synchronize: true,
   migrations: ['src/migration/**/*.ts'],
-  logging: false,
+  logging: true,
 });
 
 AppDataSource.initialize()
